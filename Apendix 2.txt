@@ -1,0 +1,70 @@
+#import necessary libraries
+import sys, time
+import initio
+
+#initiate function "init()" from "initio" file
+
+initio.init()
+
+#Check and remember current state of Obstacle sensors and Line sensors
+
+try:
+    lastL = initio.irLeft()
+    lastR = initio.irRight()
+    lastLineL = initio.irLeftLine()
+    lastLineR = initio.irRightLine()
+    while True
+
+#Continue checking state of line and obstacle sensors while the program is running
+        
+        newL = initio.irLeft()
+        newR = initio.irRight()
+        newLineL = initio.irLeftLine()
+        newLineR = initio.irRightLine()
+
+#Start moving both motors forward with a speed of 50       
+        
+        initio.turnForward(50, 50)
+
+#If the state of both line sensors changes at the same time, stop the robot
+  
+        if (newLineL != lastLineL) and (newLineR != lastLineR):
+          print ('End of The Line')
+          initio.stop()
+
+#Checks for changes of the state of the right Line sensors
+
+        if (newLineL == lastLineL) and (newLineR != lastLineR):
+          print ('Line Right')
+          initio.turnLeftReRightFw(80, 80)
+
+#Checks for changes of the state of the left Line Sensor
+
+        if (newLineL != lastLineL) and (newLineR == lastLineR):
+          print ('Line Right')
+          initio.turnLeftFwRightRe(80, 80)
+
+#Checks for chnages of the state of both Obstacle sensors
+
+        if (newL != lastL) and (newR != lastR):
+          print ('Obstacle Forward')
+          initio.stop()
+
+#Checks for changes of the state of the Left Obstacle Sensor
+
+        if (newL != lastL) and (newR == lastR):
+          print ('Obstacle to the Left)
+          initio.stop()
+
+#Checks for changes if the state of the right Obstacle Sensor
+
+        if (newL == lastL) and (newR != lastR):
+          print ('Obstacle to the Right')
+          initio.stop()
+
+#Sets time between every run of the program
+
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+       initio.cleanup()

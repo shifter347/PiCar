@@ -1,0 +1,127 @@
+#First we need to import all necessary libraries
+import RPi.GPIO as GPIO, sys, threading time, os, subprocess
+
+#Defining sepereate pins for the left and right motors("L" stands for left motor and "R" for right motor
+L1 = 19
+L2 = 21
+R1 = 24
+R2 = 26
+
+#Definig Obstacle IR sensors and sensors for Line following
+irFL = 7
+irFR = 11
+lineLeft = 12
+lineRight = 13
+
+#Now we need to define the functions that will be used in the project
+
+#Initialise GPIO pins and switch motors and lights off
+def init():
+    global p, q, a, b
+
+    GPIO.setwarnings(False)
+
+#enable physical numbers of the pins
+    GPIO.setmode(GPIO.BOARD)
+
+#set line sensors and obstacle sensors as inputs
+    GPIO.setup(lineLeft, GPIO.IN)
+    GPIO.setup(lineRight, GPIO.IN)
+    GPIO.setup(irFL, GPIO.IN)
+    GPIO.setup(irFR, GPIO.IN)
+#Stop motors from going too fast
+    GPIO.setup(L1, GPIO.OUT)
+    p = GPIO.PWM(L1, 20)
+    p.start(0)
+
+   GPIO.setup(L2, GPIO.OUT)
+    q = GPIO.PWM(L2, 20)
+    q.start(0)
+
+    GPIO.setup(R1, GPIO.OUT)
+    a = GPIO.PWM(R1, 20)
+    a.start(0)
+ 
+    GPIO.setup(R2, GPIO.OUT)
+    b = GPIO.PWM(R2, 20)
+    b.start(0)
+    
+    
+
+#Switch motors off and set GPIO to standart values
+def cleanup():
+    stop()
+    stopServos()
+    GPIO.cleanup()
+
+#Stop both motors
+def stop():
+    p.ChangeDutyCycle(0)
+    q.ChangeDutyCycle(0)
+    a.ChangeDutyCycle(0)
+    b.ChangeDutyCycle(0)
+
+#Allows for custom set of speed on each motor going forward
+def turnForward(leftSpeed, rightSpeed):
+    p.ChangeDutyCycle(leftSpeed)
+    q.ChangeDutyCycle(0)
+    a.ChangeDutyCycle(rightSpeed)
+    b.ChangeDutyCycle(0)
+    p.ChangeFrequency(leftSpeed + 5)
+    a.ChangeFrequency(rightSpeed + 5)
+
+#Allows for setting custom speed in reverse on each motor seperately
+def turnReverse(leftSpeed, rightSpeed):
+    p.ChangeDutyCycle(0)
+    q.ChangeDutyCycle(leftSpeed)
+    a.ChangeDutyCycle(0)
+    b.ChangeDutyCycle(rightSpeed)
+    q.ChangeFrequency(leftSpeed + 5)
+    b.ChangeFrequency(rightSpeed + 5)
+
+#Allows for setting custom speed forward for the left motor and reverse for the right motor
+def turnLeftFwRightRe(leftForward, rightReverse):
+    p.ChangeDutyCycle(leftForward)
+    q.ChangeDutyCycle(0)
+    a.ChangeDutyCycle(0)
+    b.ChangeDutyCycle(rightReverse)
+    p.ChangeFrequency(leftForward + 5)
+    b.ChangeFrequency(rightReverse + 5)
+
+#Allows for setting custom speed forward for the right motor and reverse for the left motor
+def turnLeftReRightFw(leftReverse, rightForward):
+    p.ChangeDutyCycle(0)
+    q.ChangeDutyCycle(leftReverse)
+    a.ChangeDutyCycle(rightForward)
+    b.ChangeDutyCycle(0)
+    q.ChangeFrequency(leftReverse + 5)
+    a.ChangeFrequency(rightForward + 5)
+
+
+#Get state of left Obsatcle Sensor
+def irLeft():
+    if GPIO.input(irFl)==0:
+       return True
+    else:
+       return False
+
+#Get state of right Obsatcle Sensor
+def irRight():
+    if GPIO.input(irFR)==0:
+       return True
+    else:
+       return False
+
+#Get state of left Line Sensor
+def irLeftLine():
+    if GPIO.input(lineLeft)==0:
+       return True
+    else:
+       return False
+
+#get state of right Line Sensor
+def irRightLine():
+    if GPIO.input(lineRight)==0
+       return True
+    else:
+       return False
